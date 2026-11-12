@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Traffic Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #d9d9d9;
+            color: #111;
+        }
+
+        .topbar {
+            height: 62px;
+            background: #23185b;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .topbar h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            color: white;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.7);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .wrapper {
+            padding: 10px 14px;
+            max-width: 1780px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: #ededed;
+            border: 3px solid #8d8d8d;
+            border-radius: 18px;
+            padding: 12px;
+            display: flex;
+            gap: 14px;
+            min-height: 420px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+        }
+
+        .signal-box {
+            width: 88px;
+            min-width: 88px;
+            background: #c3c3c3;
+            border: 2px solid #8c8c8c;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .light {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #4b4b4b;
+            border: 3px solid #222;
+        }
+
+        .red.active {
+            background: #e10000;
+            box-shadow: 0 0 18px #ff2a2a;
+        }
+
+        .green.active {
+            background: #00d84a;
+            box-shadow: 0 0 18px #00ff55;
+        }
+
+        .yellow.active {
+            background: #ffd000;
+            box-shadow: 0 0 18px #ffea00;
+        }
+
+        .lane-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-frame {
+            position: relative;
+            background: #000;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+            border: 2px solid #555;
+            border-bottom: none;
+        }
+
+        .lane-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 19px;
+            font-weight: 700;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            z-index: 2;
+        }
+
+        .video {
+            width: 100%;
+            height: 340px;
+            object-fit: cover;
+            display: block;
+            background: #000;
+        }
+
+        .info-strip {
+            background: #000;
+            color: white;
+            padding: 11px 14px;
+            font-size: 17px;
+            font-weight: 700;
+            border-radius: 0 0 12px 12px;
+            border: 2px solid #555;
+            border-top: none;
+        }
+
+        .upload-row {
+            margin-top: 10px;
+        }
+
+        .upload-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 0;
+        }
+
+        .file-input {
+            font-size: 13px;
+        }
+
+        .upload-btn {
+            background: #23185b;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1100px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .card {
+                flex-direction: column;
+            }
+
+            .signal-box {
+                width: 100%;
+                min-width: unset;
+                flex-direction: row;
+                padding: 12px;
+            }
+
+            .video {
+                height: 230px;
+            }
+
+            .info-strip {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <h2>Live Dashboard</h2>
+        <div class="topbar-actions">
+            <a href="/dashboard" class="nav-btn">Back</a>
+            <a href="/logout" class="nav-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <div class="grid">
+
+            <div class="card">
+                <div class="signal-box">
+                    <div id="lane1-red" class="light red active"></div>
+                    <div id="lane1-yellow" class="light yellow"></div>
+                    <div id="lane1-green" class="light green"></div>
+                </div>
+
+                <div class="lane-content">
+                    <div class="video-frame">
+                        <div class="lane-title">Lane 1</div>
+                        <img id="video1" class="video"
+                            {% if uploaded[1] %}src="/video1?t={{ current_density[1] }}"{% endif %}
+                            alt="Lane 1 Feed">
+                    </div>
+
+                    <div id="info1" class="info-strip">
+                        Density: 0 | Emergency: No
+                    </div>
+
+                    <div class="upload-row">
+                        <form id="form1" class="upload-form" onsubmit="return false;">
+                            <input class="file-input" type="file" name="video" accept="video/*" required>
+                            <button class="upload-btn" type="submit">Upload Lane 1 Video</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="signal-box">
+                    <div id="lane2-red" class="light red active"></div>
+                    <div id="lane2-yellow" class="light yellow"></div>
+                    <div id="lane2-green" class="light green"></div>
+                </div>
+
+                <div class="lane-content">
+                    <div class="video-frame">
+                        <div class="lane-title">Lane 2</div>
+                        <img id="video2" class="video"
+                            {% if uploaded[2] %}src="/video2?t={{ current_density[2] }}"{% endif %}
+                            alt="Lane 2 Feed">
+                    </div>
+
+                    <div id="info2" class="info-strip">
+                        Density: 0 | Emergency: No
+                    </div>
+
+                    <div class="upload-row">
+                        <form id="form2" class="upload-form" onsubmit="return false;">
+                            <input class="file-input" type="file" name="video" accept="video/*" required>
+                            <button class="upload-btn" type="submit">Upload Lane 2 Video</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="signal-box">
+                    <div id="lane3-red" class="light red active"></div>
+                    <div id="lane3-yellow" class="light yellow"></div>
+                    <div id="lane3-green" class="light green"></div>
+                </div>
+
+                <div class="lane-content">
+                    <div class="video-frame">
+                        <div class="lane-title">Lane 3</div>
+                        <img id="video3" class="video"
+                            {% if uploaded[3] %}src="/video3?t={{ current_density[3] }}"{% endif %}
+                            alt="Lane 3 Feed">
+                    </div>
+
+                    <div id="info3" class="info-strip">
+                        Density: 0 | Emergency: No
+                    </div>
+
+                    <div class="upload-row">
+                        <form id="form3" class="upload-form" onsubmit="return false;">
+                            <input class="file-input" type="file" name="video" accept="video/*" required>
+                            <button class="upload-btn" type="submit">Upload Lane 3 Video</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="signal-box">
+                    <div id="lane4-red" class="light red active"></div>
+                    <div id="lane4-yellow" class="light yellow"></div>
+                    <div id="lane4-green" class="light green"></div>
+                </div>
+
+                <div class="lane-content">
+                    <div class="video-frame">
+                        <div class="lane-title">Lane 4</div>
+                        <img id="video4" class="video"
+                            {% if uploaded[4] %}src="/video4?t={{ current_density[4] }}"{% endif %}
+                            alt="Lane 4 Feed">
+                    </div>
+
+                    <div id="info4" class="info-strip">
+                        Density: 0 | Emergency: No
+                    </div>
+
+                    <div class="upload-row">
+                        <form id="form4" class="upload-form" onsubmit="return false;">
+                            <input class="file-input" type="file" name="video" accept="video/*" required>
+                            <button class="upload-btn" type="submit">Upload Lane 4 Video</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    function setupUpload(formId, lane) {
+        const form = document.getElementById(formId);
+        const button = form.querySelector("button");
+
+        button.addEventListener("click", async function (e) {
+            e.preventDefault();
+
+            const fileInput = form.querySelector('input[name="video"]');
+            if (!fileInput.files.length) {
+                alert("Please select a video first");
+                return;
+            }
+
+            const data = new FormData();
+            data.append("video", fileInput.files[0]);
+
+            const res = await fetch(`/upload/${lane}`, {
+                method: "POST",
+                body: data
+            });
+
+            if (res.ok) {
+                document.getElementById(`video${lane}`).src = `/video${lane}?t=` + Date.now();
+                form.reset();
+                alert(`Lane ${lane} uploaded successfully`);
+            } else {
+                const msg = await res.text();
+                alert("Upload failed: " + msg);
+            }
+        });
+    }
+
+    setupUpload("form1", 1);
+    setupUpload("form2", 2);
+    setupUpload("form3", 3);
+    setupUpload("form4", 4);
+});
+</script>
+
+    <script>
+    let previousState = {};
+
+function setSignal(lane, state) {
+
+    state = state.toLowerCase();
+
+    const red = document.getElementById(`lane${lane}-red`);
+    const yellow = document.getElementById(`lane${lane}-yellow`);
+    const green = document.getElementById(`lane${lane}-green`);
+
+    let prev = previousState[lane];
+
+    // GREEN → RED transition
+    if (prev === "green" && state === "red") {
+
+        green.classList.remove("active");
+        red.classList.remove("active");
+
+        yellow.classList.add("active");
+
+        setTimeout(() => {
+
+            yellow.classList.remove("active");
+            red.classList.add("active");
+
+        }, 3000);
+
+    }
+
+    else {
+
+        red.classList.remove("active");
+        yellow.classList.remove("active");
+        green.classList.remove("active");
+
+        if (state === "green") {
+            green.classList.add("active");
+
+        } else if (state === "red") {
+            red.classList.add("active");
+
+        } else if (state === "yellow") {
+            yellow.classList.add("active");
+        }
+    }
+
+    previousState[lane] = state;
+}
+
+    async function refreshLaneData() {
+        const res = await fetch("/lane_data");
+        const data = await res.json();
+
+        for (let i = 1; i <= 4; i++) {
+            setSignal(i, data[`lane${i}`].signal);
+            document.getElementById(`info${i}`).innerHTML =
+                `Density: ${data[`lane${i}`].density} | Emergency: ${data[`lane${i}`].ambulance}`;
+        }
+    }
+
+    setInterval(refreshLaneData, 1500);
+    refreshLaneData();
+    </script>
+
+    
+</body>
+</html>

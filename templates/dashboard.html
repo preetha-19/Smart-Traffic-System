@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITMS Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body.dashboard-body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(90deg, #7b3ff2 0%, #f2994a 100%);
+            color: white;
+        }
+
+        .landing-topbar {
+            height: 64px;
+            background: #23185b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            box-sizing: border-box;
+        }
+
+        .landing-brand {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .landing-logout {
+            text-decoration: none;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .landing-logout:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .landing-wrapper {
+            min-height: calc(100vh - 64px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .landing-card {
+            max-width: 760px;
+            width: 100%;
+        }
+
+        .landing-title {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+        .landing-subtitle {
+            font-size: 23px;
+            line-height: 1.6;
+            margin: 0 auto 34px;
+            max-width: 950px;
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        .landing-actions {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .landing-btn {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 14px 28px;
+            border-radius: 10px;
+            min-width: 190px;
+            display: inline-block;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .landing-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .live-btn {
+            background: linear-gradient(90deg, #6a11cb 0%, #ff8c00 100%);
+        }
+
+        .analysis-btn {
+            background: linear-gradient(90deg, #1e90ff 0%, #00c6ff 100%);
+        }
+
+        @media (max-width: 768px) {
+            .landing-title {
+                font-size: 40px;
+            }
+
+            .landing-subtitle {
+                font-size: 18px;
+            }
+
+            .landing-btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="landing-topbar">
+        <div class="landing-brand">ITMS</div>
+        <a href="/logout" class="landing-logout">Logout</a>
+    </div>
+
+    <div class="landing-wrapper">
+        <div class="landing-card">
+            <div class="landing-title">ITMS Dashboard</div>
+
+            <p class="landing-subtitle">
+                Intelligent Traffic Monitoring System using AI-based vehicle detection,
+                smart signal timing, and live traffic analysis.
+            </p>
+
+            <div class="landing-actions">
+                <a href="/live_dashboard" class="landing-btn live-btn">Live Dashboard</a>
+                <a href="/analysis" class="landing-btn analysis-btn">Analysis Report</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

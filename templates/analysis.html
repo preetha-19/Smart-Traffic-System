@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta http-equiv="refresh" content="5">
+</head>
+<body class="analysis-body">
+
+    <div class="analysis-topbar">
+        <h1>Analysis Dashboard</h1>
+        <div class="dashboard-actions">
+            <a href="/dashboard" class="nav-btn">Back</a>
+            <a href="/logout" class="nav-btn logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="analysis-panel">
+        <h2>Cumulative Vehicles Passed (Per Lane)</h2>
+        <p>Latest detected vehicle counted in each Lane.</p>
+
+        <table class="analysis-table">
+            <tr>
+                <th>Lane</th>
+                <th>Cars</th>
+                <th>Buses</th>
+                <th>Trucks</th>
+                <th>Motorcycles</th>
+                <th>Ambulances</th>
+                <th>Total</th>
+            </tr>
+            {% for i in range(1, 5) %}
+            <tr>
+                <td>Lane {{ i }}</td>
+                <td>{{ stats[i]["car"] }}</td>
+                <td>{{ stats[i]["bus"] }}</td>
+                <td>{{ stats[i]["truck"] }}</td>
+                <td>{{ stats[i]["motorcycle"] }}</td>
+                <td>{{ stats[i]["ambulance"] }}</td>
+                <td>{{ stats[i]["car"] + stats[i]["bus"] + stats[i]["truck"] + stats[i]["motorcycle"] + stats[i]["ambulance"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="analysis-panel">
+        <h2>Current Traffic Density (Live)</h2>
+        <p>Live snapshot of vehicle count in each lane.</p>
+        <canvas id="densityChart"></canvas>
+    </div>
+
+    
+
+    <script>
+        const ctx = document.getElementById('densityChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Lane 1', 'Lane 2', 'Lane 3', 'Lane 4'],
+                datasets: [{
+                    label: 'Current Vehicle Density',
+                    data: [
+                        {{ current_density[1] }},
+                        {{ current_density[2] }},
+                        {{ current_density[3] }},
+                        {{ current_density[4] }}
+                    ],
+                    backgroundColor: [
+                        'rgba(244, 143, 177, 0.85)',
+                        'rgba(100, 181, 246, 0.85)',
+                        'rgba(255, 224, 130, 0.85)',
+                        'rgba(128, 222, 234, 0.85)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
